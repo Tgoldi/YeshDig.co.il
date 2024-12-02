@@ -96,7 +96,7 @@ export function Hero() {
             </motion.div>
 
             <motion.div 
-              className="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-3 pt-4"
+              className="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-3 pt-4 border rounded-xl border-primary/20 p-4 bg-background/50 backdrop-blur-sm"
               variants={container}
             >
               {[
@@ -106,21 +106,23 @@ export function Hero() {
               ].map((stat, index) => (
                 <motion.div 
                   key={stat.label}
-                  className="card-hover p-4 rounded-lg bg-card/50 backdrop-blur-sm"
+                  className={`card-hover p-4 rounded-lg border-2 border-transparent bg-transparent [background-clip:padding-box] relative text-center
+                    before:absolute before:inset-0 before:-z-10 before:m-[-2px] before:rounded-lg before:bg-gradient-to-r before:from-primary before:to-accent
+                    ${index === 2 ? 'col-span-2 md:col-span-1' : ''}`}
                   variants={item}
                   custom={index}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <motion.div 
-                    className="text-2xl sm:text-3xl lg:text-4xl font-bold gradient-text mb-2"
+                    className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 text-center text-foreground"
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 + index * 0.1 }}
                   >
                     {stat.value}
                   </motion.div>
-                  <div className="text-sm sm:text-base text-muted-foreground">
+                  <div className="text-sm sm:text-base text-muted-foreground text-center">
                     {stat.label}
                   </div>
                 </motion.div>

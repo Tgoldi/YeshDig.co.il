@@ -28,28 +28,37 @@ export function Contact() {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('https://formspree.io/f/mrbgylra', {
-        method: 'POST',
+      const formUrl = window.location.href;
+      const urlRefer = document.referrer;
+      const channelId = "website";
+
+      const apiUrl = `https://www.fixdigital.co.il/api/v1.2/lead/addApi?projectID=11860&projectTypeID=10&clientID=21350&tenantID=7768&FORMURL=${encodeURIComponent(formUrl)}&URLREFER=${encodeURIComponent(urlRefer)}&name=${encodeURIComponent(data.name)}&email=${encodeURIComponent(data.email)}&phone=${encodeURIComponent(data.phone)}&channelid=${encodeURIComponent(channelId)}&message=${encodeURIComponent(data.message)}&source=website`;
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Network response was not ok');
+        throw new Error('Network response was not ok');
       }
 
-      const result = await response.json();
-      if (result.ok) {
-        setIsSuccess(true);
-        reset();
-        toast.success("ההודעה נשלחה בהצלחה!");
+      const responseText = await response.text();
+      let result;
+      try {
+        result = responseText ? JSON.parse(responseText) : {};
+      } catch (e) {
+        result = { success: true };
       }
+      
+      setIsSuccess(true);
+      reset();
+      toast.success("ההודעה נשלחה בהצלחה!");
     } catch (error) {
-      console.error('Form submission error:', error);
-      toast.error(error instanceof Error ? error.message : 'שגיאה בשליחת הטופס. אנא נסו שנית.');
+      toast.error('שגיאה בשליחת הטופס. אנא נסו שנית.');
     } finally {
       setIsSubmitting(false);
     }

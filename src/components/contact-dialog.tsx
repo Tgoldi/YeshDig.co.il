@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,31 +39,37 @@ export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }
     const onSubmit = async (data: ContactFormData) => {
         setIsSubmitting(true);
         try {
-            const response = await fetch('https://formspree.io/f/mrbgylra', {
-                method: 'POST',
+            const formUrl = window.location.href;
+            const urlRefer = document.referrer;
+            const channelId = "website";
+
+            const apiUrl = `https://www.fixdigital.co.il/api/v1.2/lead/addApi?projectID=11860&projectTypeID=10&clientID=21350&tenantID=7768&FORMURL=${encodeURIComponent(formUrl)}&URLREFER=${encodeURIComponent(urlRefer)}&name=${encodeURIComponent(data.name)}&email=${encodeURIComponent(data.email)}&phone=${encodeURIComponent(data.phone)}&channelid=${encodeURIComponent(channelId)}&message=${encodeURIComponent(data.message)}&plan=${encodeURIComponent(data.plan)}&source=website`;
+
+            const response = await fetch(apiUrl, {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ...data,
-                    _subject: `בקשת הצעת מחיר - ${planName}`
-                }),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Network response was not ok');
+                throw new Error('Network response was not ok');
             }
 
-            const result = await response.json();
-            if (result.ok) {
-                reset();
-                toast.success("ההודעה נשלחה בהצלחה!");
-                onClose();
+            const responseText = await response.text();
+            let result;
+            try {
+                result = responseText ? JSON.parse(responseText) : {};
+            } catch (e) {
+                result = { success: true };
             }
+
+            reset();
+            toast.success("ההודעה נשלחה בהצלחה!");
+            onClose();
         } catch (error) {
-            console.error('Form submission error:', error);
-            toast.error("שגיאה בשליחת הטופס. אנא נסו שנית.");
+            toast.error('שגיאה בשליחת הטופס. אנא נסו שנית.');
         } finally {
             setIsSubmitting(false);
         }
@@ -74,6 +80,9 @@ export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle className="text-right">בקשת הצעת מחיר - {planName}</DialogTitle>
+                    <DialogDescription className="text-right">
+                        אנא מלאו את הפרטים ונחזור אליכם בהקדם
+                    </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <input type="hidden" {...register("plan")} />

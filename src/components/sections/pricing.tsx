@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
+import { ContactDialog } from "@/components/contact-dialog";
 
 const hostingPlans = [
   {
@@ -22,7 +24,7 @@ const hostingPlans = [
     ]
   },
   {
-    name: "חבילה מדמית",
+    name: "חבילה תדמית",
     price: "1,650",
     originalPrice: "2,000",
     discount: "18%",
@@ -122,6 +124,16 @@ const marketingPlans = [
 ];
 
 export function Pricing() {
+  const [selectedPlan, setSelectedPlan] = useState<{
+    name: string;
+    price: string;
+    type: "hosting" | "marketing";
+  } | null>(null);
+
+  const handlePlanSelect = (plan: typeof selectedPlan) => {
+    setSelectedPlan(plan);
+  };
+
   return (
     <section id="pricing" className="py-20 bg-muted/50">
       <div className="container mx-auto px-4">
@@ -193,6 +205,11 @@ export function Pricing() {
                           : 'hover:bg-accent/10'
                       }`} 
                       variant={plan.popular ? "default" : "outline"}
+                      onClick={() => handlePlanSelect({
+                        name: plan.name,
+                        price: plan.price,
+                        type: "hosting"
+                      })}
                     >
                       בחר תוכנית
                     </Button>
@@ -261,6 +278,11 @@ export function Pricing() {
                           : 'hover:bg-accent/10'
                       }`} 
                       variant={plan.popular ? "default" : "outline"}
+                      onClick={() => handlePlanSelect({
+                        name: plan.name,
+                        price: plan.price,
+                        type: "marketing"
+                      })}
                     >
                       בחר תוכנית
                     </Button>
@@ -271,6 +293,16 @@ export function Pricing() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {selectedPlan && (
+        <ContactDialog
+          isOpen={!!selectedPlan}
+          onClose={() => setSelectedPlan(null)}
+          planName={selectedPlan.name}
+          planPrice={selectedPlan.price}
+          planType={selectedPlan.type}
+        />
+      )}
     </section>
   );
 }
