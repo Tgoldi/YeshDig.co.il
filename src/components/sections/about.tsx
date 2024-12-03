@@ -3,8 +3,8 @@ import { CheckCircle2 } from "lucide-react";
 const benefits = [
   " שירות אישי ומותאם לצרכי העסק שלך",
   "זמינות גבוהה ומענה מהיר ללקוחות",
-  "שקיפות מלאה בתהליכי העבודה ובדיווח תוצאות",
-  "מחירים תחרותיים עם יחס עלות-תועלת מצוין",
+  "שקיפות מלאה ומתן דוחות חודשיים",
+  "מחירים מעולים ויחס עלות-תועלת מצוין",
   "התמחות במגוון פלטפורמות דיגיטליות",
   "התאמת חבילות השירות המוצעים בהתאם לצרכי העסק",
 ];
@@ -33,7 +33,7 @@ export function About() {
             </ul>
           </div>
           
-          <div className="relative group">
+          <div className="relative group hidden md:block">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300" />
             <img
               src="/new business partners shaking hands.png"

@@ -14,12 +14,12 @@ const services = [
   },
   {
     icon: BarChart2,
-    title: " ניהול תוכן ברשתות החברתיות (Facebook & Instagram)",
+    title: "ניהול תוכן ברשתות החברתיות (Facebook & Instagram)",
     description: "יצירת והפקת תוכן מקצועי (צילומים, סרטונים ופוסטים) בפלטפורמות Meta, כולל קופירייטינג והעלאה שוטפת. שירות מענה במסנג'ר זמין כתוספת (חודש ראשון ללא עלות)."
   },
   {
     icon: Megaphone,
-    title: "ניהול קמפיינים ממומנים בInstagram & Facebook ",
+    title: "קמפיינים ממומנים ב<br />Instagram & Facebook",
     description: "ניהול קמפיינים ממומנים בפלטפורמות Meta, אסטרטגיית פרסום מותאמת אישית בפייסבוק ואינסטגרם, הקמת קמפיינים ממוקדי מטרה, אופטימיזציה שוטפת וניתוח ביצועים. כולל הגדרת קהלים, התקנת פיקסל ומעקב המרות."
   },
   {
@@ -58,7 +58,7 @@ export function Services() {
                 <div className="mb-4 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <service.icon className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
+                <CardTitle className="text-xl mb-2" dangerouslySetInnerHTML={{ __html: service.title }} />
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">{service.description}</p>

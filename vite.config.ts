@@ -17,13 +17,27 @@ export default defineConfig({
         description: 'פתרונות דיגיטל מתקדמים לעסקים',
         theme_color: '#000000',
         background_color: '#ffffff',
+        display: 'standalone',
+        orientation: 'portrait',
         icons: [
           {
             src: '/android-chrome-192x192.png',
             sizes: '192x192',
             type: 'image/png'
+          },
+          {
+            src: '/android-chrome-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
           }
-        ]
+        ],
+        start_url: '/',
+        scope: '/'
+      },
+      workbox: {
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true
       }
     }),
     viteCompression({
@@ -63,12 +77,25 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'framer-motion'],
-          ui: ['@radix-ui/react-accordion', '@radix-ui/react-dialog'],
+          vendor: ['react', 'react-dom'],
+          motion: ['framer-motion'],
+          ui: [
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-dialog',
+            // ... other UI components
+          ],
         }
       }
     },
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
+    target: ['es2015', 'chrome63', 'firefox67', 'safari11.1'],
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    }
   },
   envPrefix: 'VITE_'
 });

@@ -16,11 +16,14 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --video-filter: none;
 }
 
 .dark {
   background-color: #000000;
   color: #ffffff;
+  --video-filter: brightness(0.8) contrast(1.2);
 }
 
 html {
@@ -36,20 +39,20 @@ html {
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 195 100% 73%;
-    --primary-foreground: 195 100% 20%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 195 100% 73%;
-    --accent-foreground: 195 100% 20%;
+    --primary: 195 100% 45%;
+    --primary-foreground: 195 100% 98%;
+    --secondary: 195 50% 96.1%;
+    --secondary-foreground: 195 50% 9%;
+    --muted: 195 50% 96.1%;
+    --muted-foreground: 195 50% 25%;
+    --accent: 195 100% 45%;
+    --accent-foreground: 195 100% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 195 100% 73%;
-    --chart-1: 195 100% 73%;
+    --border: 195 50% 89.8%;
+    --input: 195 50% 89.8%;
+    --ring: 195 100% 45%;
+    --chart-1: 195 100% 45%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
@@ -59,9 +62,9 @@ html {
 
   .dark {
     --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
+    --foreground: 0 0% 90%;
     --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: 0 0% 90%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
     --primary: 195 100% 73%;
@@ -69,7 +72,7 @@ html {
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted-foreground: 0 0% 75%;
     --accent: 195 100% 73%;
     --accent-foreground: 195 100% 20%;
     --destructive: 0 62.8% 30.6%;
@@ -91,6 +94,9 @@ html {
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
   }
 }
 
@@ -156,4 +162,20 @@ html {
 
 .animate-pulse-ring {
   animation: pulse-ring 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.text-shadow-sm {
+  text-shadow: 
+    -1px -1px 0 rgba(var(--muted-foreground), 0.2),
+    1px -1px 0 rgba(var(--muted-foreground), 0.2),
+    -1px 1px 0 rgba(var(--muted-foreground), 0.2),
+    1px 1px 0 rgba(var(--muted-foreground), 0.2);
+}
+
+.stats-label {
+  color: hsl(196, 18%, 16%);  /* Light mode color */
+}
+
+.dark .stats-label {
+  color: hsl(0, 0%, 0%);     /* Dark mode color */
 }

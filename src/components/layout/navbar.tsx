@@ -15,6 +15,7 @@ const menuItems = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,7 +41,11 @@ export function Navbar() {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      setIsOpen(false);
+      
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     }
   };
 
@@ -58,18 +63,29 @@ export function Navbar() {
           {/* Mobile Menu - Left Side */}
           <div className="md:hidden flex items-center gap-4 order-2">
             <ThemeToggle />
-            <a href="/" className="flex items-center gap-2">
-              <img 
-                src="/yes-digital-logo.svg" 
-                alt="יש דיגיטל" 
-                className="h-8 md:h-10 w-auto transition-transform hover:scale-105"
-              />
-            </a>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isScrolled ? 1 : 0 }}
+              transition={{ 
+                duration: 0.6,
+                ease: "easeOut"
+              }}
+            >
+              {isScrolled && (
+                <a href="/" className="flex items-center gap-2">
+                  <img 
+                    src="/yes-digital-logo.svg" 
+                    alt="יש דיגיטל" 
+                    className="h-8 w-auto transition-transform hover:scale-105"
+                  />
+                </a>
+              )}
+            </motion.div>
           </div>
 
           {/* Hamburger - Right Side */}
           <div className="md:hidden order-1">
-            <Sheet>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-6 w-6" />
@@ -84,10 +100,7 @@ export function Navbar() {
                   {menuItems.map((item) => (
                     <button
                       key={item.href}
-                      onClick={() => {
-                        scrollToSection(item.href);
-                        (document.querySelector('[data-radix-collection-item]') as HTMLElement)?.click();
-                      }}
+                      onClick={() => scrollToSection(item.href)}
                       className={`text-right w-full px-4 py-2 rounded-lg transition-colors font-bold ${
                         activeSection === item.href.slice(1)
                           ? "bg-primary/10 text-primary"
@@ -98,10 +111,7 @@ export function Navbar() {
                     </button>
                   ))}
                   <Button 
-                    onClick={() => {
-                      scrollToSection("#contact");
-                      (document.querySelector('[data-radix-collection-item]') as HTMLElement)?.click();
-                    }}
+                    onClick={() => scrollToSection("#contact")}
                     className="mt-4 w-full button-hover bg-gradient-to-r from-primary to-accent hover:opacity-90 font-bold"
                   >
                     צור קשר
@@ -112,20 +122,15 @@ export function Navbar() {
           </div>
 
           {/* Desktop Logo - Left Side (Hidden on mobile) */}
-          <motion.div 
-            className="hidden md:flex items-center gap-4 w-1/4"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="hidden md:flex items-center gap-4 w-1/4">
             <a href="/" className="flex items-center gap-2">
               <img 
                 src="/yes-digital-logo.svg" 
                 alt="יש דיגיטל" 
-                className="h-8 md:h-10 w-auto transition-transform hover:scale-105"
+                className="h-10 w-auto transition-transform hover:scale-105"
               />
             </a>
-          </motion.div>
+          </div>
 
           {/* Desktop Menu - Centered (Hidden on mobile) */}
           <div className="hidden md:flex items-center justify-center flex-1">

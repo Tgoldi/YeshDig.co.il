@@ -30,29 +30,20 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Add a timeout as fallback
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // 3 seconds maximum loading time
+
     window.addEventListener('load', () => {
       setIsLoading(false);
+      clearTimeout(timeoutId);
     });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-      }
-    );
-
-    document.querySelectorAll("section").forEach((section) => {
-      section.classList.add("section-fade-in");
-      observer.observe(section);
-    });
-
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('load', () => setIsLoading(false));
+    };
   }, []);
 
   return (

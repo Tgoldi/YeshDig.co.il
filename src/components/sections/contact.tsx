@@ -12,7 +12,9 @@ import { motion, AnimatePresence } from "framer-motion";
 const contactSchema = z.object({
   name: z.string().min(2, "השם חייב להכיל לפחות 2 תווים"),
   email: z.string().email("כתובת אימייל לא תקינה"),
-  phone: z.string().min(9, "מספר טלפון לא תקין"),
+  phone: z.string()
+    .min(10, "מספר טלפון לא תקין")
+    .max(10, "מספר טלפון לא תקין"),
   message: z.string().min(10, "ההודעה חייבת להכיל לפחות 10 תווים"),
 });
 
@@ -21,7 +23,7 @@ type ContactFormData = z.infer<typeof contactSchema>;
 export function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const { register, handleSubmit, reset, formState: { } } = useForm<ContactFormData>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
 
@@ -178,6 +180,9 @@ export function Contact() {
                       className="bg-background/50 border-primary/20 focus:border-primary"
                       required
                     />
+                    {errors.phone && (
+                      <p className="text-sm text-red-500 mt-1">{errors.phone.message}</p>
+                    )}
                   </div>
                   <div>
                     <Textarea 
