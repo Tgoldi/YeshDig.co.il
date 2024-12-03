@@ -58,11 +58,10 @@ export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }
             }
 
             const responseText = await response.text();
-            let result;
             try {
-                result = responseText ? JSON.parse(responseText) : {};
+                if (responseText) JSON.parse(responseText);
             } catch (e) {
-                result = { success: true };
+                // Ignore parsing errors
             }
 
             reset();
