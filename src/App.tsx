@@ -12,8 +12,7 @@ import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
 import { PreLoader } from "@/components/PreLoader";
 import { Helmet } from "react-helmet-async";
-import { PrivacyPolicy } from "@/components/pages/PrivacyPolicy";
-import { TermsOfUse } from "@/components/pages/TermsOfUse";
+import { LegalPage } from "@/components/pages/LegalPage";
 
 // This will be used for SSG
 export async function onBeforeRender() {
@@ -100,8 +99,7 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-of-use" element={<TermsOfUse />} />
+            <Route path="/legal" element={<LegalPage />} />
           </Routes>
         </main>
         <Footer />

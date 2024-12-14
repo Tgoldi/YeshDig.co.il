@@ -1,12 +1,32 @@
 import { Facebook, Instagram } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function Footer() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleNavigation = (to: string) => {
-    navigate(to);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToSection = (href: string) => {
+    // If we're not on the home page, navigate home first
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Wait for navigation to complete before scrolling
+      setTimeout(() => {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    } else {
+      // If we're already on the home page, just scroll
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  const handleLegalClick = () => {
+    navigate('/legal');
   };
 
   return (
@@ -18,7 +38,8 @@ export function Footer() {
             <img 
               src="/yes-digital-logo.svg" 
               alt="יש דיגיטל" 
-              className="h-10 mb-6 hover:opacity-80 transition-opacity" 
+              className="h-10 mb-6 hover:opacity-80 transition-opacity cursor-pointer" 
+              onClick={() => navigate('/')}
             />
             <p className="text-muted-foreground">
               פתרונות דיגיטל מתקדמים לעסקים
@@ -30,15 +51,15 @@ export function Footer() {
             <ul className="space-y-3">
               {["services", "about", "pricing", "contact"].map((link) => (
                 <li key={link}>
-                  <a 
-                    href={`#${link}`} 
+                  <button 
+                    onClick={() => scrollToSection(`#${link}`)}
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link === "services" && "שירותים"}
                     {link === "about" && "אודות"}
                     {link === "pricing" && "מחירים"}
                     {link === "contact" && "צור קשר"}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -53,7 +74,7 @@ export function Footer() {
                 "ניהול תוכן ברשתות החברתיות",
                 "ניהול קמפיינים ממומנים",
                 "הקמת דפי נחיתה",
-                " ייעוץ שיווקי דיגיטלי"
+                "ייעוץ שיווקי דיגיטלי"
               ].map((service) => (
                 <li key={service} className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">
                   {service}
@@ -71,7 +92,9 @@ export function Footer() {
               ].map(({ Icon, href }, index) => (
                 <a 
                   key={index}
-                  href={href} 
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer" 
                   className="w-10 h-10 rounded-lg bg-muted/50 hover:bg-primary/10 flex items-center justify-center transition-colors"
                 >
                   <Icon className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
@@ -85,16 +108,10 @@ export function Footer() {
           <div className="text-center">
             <div className="flex justify-center gap-6 mb-4">
               <button
-                onClick={() => handleNavigation('/privacy-policy')}
+                onClick={handleLegalClick}
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                מדיניות פרטיות
-              </button>
-              <button
-                onClick={() => handleNavigation('/terms-of-use')}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                תנאי שימוש
+                מדיניות פרטיות ותנאי שימוש
               </button>
             </div>
             <p className="text-muted-foreground">

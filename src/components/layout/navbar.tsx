@@ -14,8 +14,7 @@ const menuItems = [
 ];
 
 const legalItems = [
-  { to: "/privacy-policy", label: "מדיניות פרטיות" },
-  { to: "/terms-of-use", label: "תנאי שימוש" },
+  { to: "/legal", label: "מדיניות פרטיות ותנאי שימוש" },
 ];
 
 export function Navbar() {
@@ -29,7 +28,7 @@ export function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
 
-      // Only track active section on home page
+      // Only track sections on home page
       if (location.pathname === '/') {
         const sections = menuItems.map(item => item.href.slice(1));
         const currentSection = sections.find(section => {
@@ -74,13 +73,12 @@ export function Navbar() {
   const handleNavigation = (to: string) => {
     setIsOpen(false);
     navigate(to);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <motion.nav 
       className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/95 backdrop-blur-md shadow-lg" : ""
+        isScrolled || location.pathname !== '/' ? "bg-background/95 backdrop-blur-md shadow-lg" : ""
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -219,7 +217,7 @@ export function Navbar() {
                 <motion.button
                   key={item.to}
                   onClick={() => handleNavigation(item.to)}
-                  className={`text-sm font-bold transition-colors ${
+                  className={`text-sm font-bold transition-colors relative ${
                     location.pathname === item.to
                       ? "text-primary"
                       : "text-foreground/70 hover:text-foreground"
@@ -230,6 +228,12 @@ export function Navbar() {
                   transition={{ duration: 0.3, delay: 0.1 * (index + menuItems.length) }}
                 >
                   {item.label}
+                  {location.pathname === item.to && (
+                    <motion.span 
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
+                      layoutId="activeSection"
+                    />
+                  )}
                 </motion.button>
               ))}
             </motion.div>
