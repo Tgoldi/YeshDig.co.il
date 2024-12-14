@@ -111,7 +111,7 @@ export function Footer() {
                 onClick={handleLegalClick}
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                מדיניות פרטיות ותנאי שימוש
+                מדיניות האתר
               </button>
             </div>
             <p className="text-muted-foreground">

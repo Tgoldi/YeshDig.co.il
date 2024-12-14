@@ -12,7 +12,7 @@ if (import.meta.env.PROD) {
   const app = (
     <StrictMode>
       <HelmetProvider context={helmetContext}>
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
           <App />
         </ThemeProvider>
       </HelmetProvider>
@@ -26,7 +26,7 @@ if (import.meta.env.PROD) {
     <StrictMode>
       <ErrorBoundary>
         <HelmetProvider>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
             <App />
           </ThemeProvider>
         </HelmetProvider>

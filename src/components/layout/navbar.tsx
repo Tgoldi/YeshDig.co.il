@@ -14,7 +14,7 @@ const menuItems = [
 ];
 
 const legalItems = [
-  { to: "/legal", label: "מדיניות פרטיות ותנאי שימוש" },
+  { to: "/legal", label: "מדיניות האתר" },
 ];
 
 export function Navbar() {
