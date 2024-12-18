@@ -1,5 +1,6 @@
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 export function Footer() {
   const navigate = useNavigate();
@@ -85,19 +86,24 @@ export function Footer() {
 
           <div>
             <h3 className="font-medium mb-6 text-lg">עקבו אחרינו</h3>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-5 gap-4 sm:gap-6 max-w-[280px] sm:max-w-none mx-auto">
               {[
                 { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61566661383182" },
                 { Icon: Instagram, href: "https://www.instagram.com/yesh.digital/?fbclid=IwZXh0bgNhZW0CMTEAAR34phfdnFPsQSNW2yFuZGdhL5FrnKzoo0a11tFZWjFwgPoESNHB3m0SeU8_aem_7Du1IZp6UPO7N140Lvrp0w" },
+                { Icon: TikTokIcon, href: "https://www.tiktok.com/@yeshdigital" },
+                { Icon: Youtube, href: "https://www.youtube.com/channel/UC5EA24nn5o9kBgTQFeAvTaQ" },
+                { Icon: Linkedin, href: "https://linkedin.com/company/%D7%99%D7%A9-%D7%A9%D7%99%D7%95%D7%95%D7%A7-%D7%91%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C/" }
               ].map(({ Icon, href }, index) => (
                 <a 
                   key={index}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer" 
-                  className="w-10 h-10 rounded-lg bg-muted/50 hover:bg-primary/10 flex items-center justify-center transition-colors"
+                  className="flex items-center justify-center"
                 >
-                  <Icon className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-muted/50 hover:bg-primary/10 flex items-center justify-center transition-all hover:scale-110">
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground hover:text-primary transition-colors" />
+                  </div>
                 </a>
               ))}
             </div>

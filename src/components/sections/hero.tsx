@@ -69,7 +69,7 @@ export function Hero() {
               className="text-lg md:text-xl text-muted-foreground max-w-2xl lg:max-w-none mx-auto lg:mx-0"
               variants={item}
             >
-            מתמחים בקידום אתרים אורגנית וממומן במגוון פלטפורמות. אצלנו תוכלו למצוא גם הקמת אתרים ודפי נחיתה.
+              מתמחים בקידום אתרים אורגנית וממומן במגוון פלטפורמות. אצלנו תוכלו למצוא גם הקמת אתרים ודפי נחיתה.
             </motion.p>
             
             <motion.div 
@@ -108,21 +108,22 @@ export function Hero() {
                   key={stat.label}
                   className={`flex flex-col items-center justify-center card-hover p-4 rounded-lg border-2 border-transparent bg-transparent [background-clip:padding-box] relative
                     before:absolute before:inset-0 before:-z-10 before:m-[-2px] before:rounded-lg before:bg-gradient-to-r before:from-primary before:to-accent
-                    ${index === 2 ? 'col-span-2 md:col-span-1' : ''} ${index === 0 ? 'md:flex md:justify-center' : ''}`}
+                    ${index === 0 ? 'col-span-2 md:col-span-1 md:flex md:items-center md:justify-center' : 'col-span-1'}`}
                   variants={item}
                   custom={index}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <motion.div 
-                    className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center justify-center w-full text-foreground"
+                    className={`text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center justify-center w-full text-foreground
+                      ${index === 0 ? 'text-right md:text-center' : ''}`}
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6 + index * 0.1 }}
                   >
                     {stat.value}
                   </motion.div>
-                  <div className="stats-label text-sm sm:text-base w-full text-center">
+                  <div className={`stats-label text-sm sm:text-base w-full ${index === 0 ? 'text-right md:text-center' : 'text-center'}`}>
                     <span className="text-shadow-sm">
                       {stat.label}
                     </span>

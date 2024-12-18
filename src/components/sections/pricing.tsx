@@ -7,7 +7,7 @@ import { ContactDialog } from "@/components/contact-dialog";
 
 const hostingPlans = [
   {
-    name: "חבילה מסיסית",
+    name: "חבילה בסיסית",
     price: "999",
     originalPrice: "1,200",
     discount: "17%",
@@ -29,7 +29,7 @@ const hostingPlans = [
     duration: "זמן מחירון: 7 ימי עסקים",
     popular: true,
     features: [
-      "3 בלוקים",
+      "שלוש בלוקים",
       "הצגת העסק בצורה מפורטת",
       "תמונות ללא הגבלה",
       "עיצוב רספונסיבי למובייל",
@@ -45,7 +45,7 @@ const hostingPlans = [
     discount: "14%",
     duration: "זמן מחירון: 10 ימי עסקים",
     features: [
-      "5 בלוקים",
+      "חמש בלוקים",
       "הצגת העסק בצורה מפורטת ומקצועית",
       "תמונות ללא הגבלה + עיצוב",
       "אינטגרציה מקצועית לכל צורך",
@@ -157,11 +157,11 @@ export function Pricing() {
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 flex flex-col-reverse md:flex-row">
+            <div className="grid grid-cols-1 md:grid-cols-none md:flex md:flex-row-reverse gap-8">
               {hostingPlans.map((plan, index) => (
                 <Card 
                   key={index}
-                  className={`relative card-hover text-right ${
+                  className={`relative card-hover text-right md:w-1/3 ${
                     plan.popular ? 'border-primary shadow-lg scale-105' : ''
                   }`}
                 >
@@ -228,11 +228,11 @@ export function Pricing() {
               </p>
             </div>
             
-            <div className="grid lg:grid-cols-4 gap-8 flex flex-col-reverse lg:flex-row">
+            <div className="grid grid-cols-1 lg:grid-cols-none lg:flex lg:flex-row-reverse gap-8">
               {marketingPlans.map((plan, index) => (
                 <Card 
                   key={index}
-                  className={`relative card-hover text-right ${
+                  className={`relative card-hover text-right lg:w-1/4 ${
                     plan.popular ? 'border-primary shadow-lg scale-105' : ''
                   }`}
                 >
