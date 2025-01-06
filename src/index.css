@@ -1,0 +1,387 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  scroll-behavior: smooth;
+
+  color-scheme: light dark;
+  background-color: #ffffff;
+  color: #000000;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --primary: 195 100% 40%;
+  --primary-foreground: 195 100% 98%;
+  --muted-foreground: 195 50% 30%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+}
+
+.dark {
+  background-color: #000000;
+  color: #ffffff;
+
+  --primary: 195 100% 73%;
+  --primary-foreground: 195 100% 20%;
+  --muted-foreground: 0 0% 75%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --secondary: 195 50% 96.1%;
+    --secondary-foreground: 195 50% 9%;
+    --accent: 195 100% 45%;
+    --accent-foreground: 195 100% 98%;
+    --border: 195 50% 89.8%;
+    --input: 195 50% 89.8%;
+    --ring: 195 100% 45%;
+    --chart-1: 195 100% 45%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 90%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 195 100% 73%;
+    --accent-foreground: 195 100% 20%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 195 100% 73%;
+    --chart-1: 195 100% 73%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+  }
+}
+
+/* Video styles */
+video {
+  transition: all 0.3s ease;
+  mix-blend-mode: multiply;
+}
+
+.dark video {
+  mix-blend-mode: normal;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-all {
+  @apply duration-300 ease-in-out;
+}
+
+/* Enhanced card hover effects */
+.card-hover {
+  @apply transition-all hover:shadow-lg hover:scale-[1.02] hover:border-primary/50;
+}
+
+/* Enhanced button hover effects */
+.button-hover {
+  @apply hover:scale-[1.02] active:scale-[0.98] transition-all;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+}
+
+/* Section transitions */
+.section-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.section-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Preloader animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.text-shadow-sm {
+  text-shadow: 
+    -1px -1px 0 rgba(var(--muted-foreground), 0.2),
+    1px -1px 0 rgba(var(--muted-foreground), 0.2),
+    -1px 1px 0 rgba(var(--muted-foreground), 0.2),
+    1px 1px 0 rgba(var(--muted-foreground), 0.2);
+}
+
+.stats-label {
+  color: hsl(196, 18%, 16%);  /* Light mode color */
+}
+
+.dark .stats-label {
+  color: hsl(0, 0%, 0%);     /* Dark mode color */
+}
+
+/* Use CSS containment where possible */
+.contained-component {
+  contain: content;
+}
+
+/* Use CSS will-change for elements that animate frequently */
+.animated-element {
+  will-change: transform;
+}
+
+/* Reduce paint operations by using transform instead of top/left */
+.moving-element {
+  transform: translate(0, 0);
+}
+
+:focus-visible {
+  outline: 3px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+.card-hover:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+}
+
+.button-hover:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+}
+
+/* Skip to main content link */
+.skip-to-content {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -100%;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  padding: 0.5rem 1rem;
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Reduce motion if user prefers */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Accessibility Styles */
+.monochrome {
+  filter: grayscale(100%) !important;
+}
+
+.sepia {
+  filter: sepia(100%) !important;
+}
+
+.high-contrast {
+  filter: contrast(150%) !important;
+}
+
+.black-yellow {
+  filter: invert(100%) hue-rotate(180deg) !important;
+  background: black !important;
+}
+
+.black-yellow img {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+.invert-colors {
+  filter: invert(100%) !important;
+}
+
+.highlight-titles h1,
+.highlight-titles h2,
+.highlight-titles h3,
+.highlight-titles h4,
+.highlight-titles h5,
+.highlight-titles h6 {
+  background-color: yellow !important;
+  color: black !important;
+}
+
+.highlight-links a {
+  background-color: cyan !important;
+  color: black !important;
+  text-decoration: underline !important;
+}
+
+.show-tooltips [title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: black;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 14px;
+  z-index: 1000;
+}
+
+.fixed-tooltips [title]::after {
+  content: " (" attr(title) ")";
+  font-size: 0.8em;
+  font-style: italic;
+  color: #666;
+}
+
+.readable-font {
+  font-family: Arial, sans-serif !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+}
+
+.big-cursor,
+.big-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="white" stroke="black" stroke-width="1"/></svg>') 16 16, auto !important;
+}
+
+.black-cursor,
+.black-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="black"/></svg>') 8 8, auto !important;
+}
+
+.reading-mode {
+  background: #f8f9fa !important;
+  color: #202124 !important;
+}
+
+.reading-mode article {
+  max-width: 680px !important;
+  margin: 0 auto !important;
+  padding: 20px !important;
+}
+
+.reading-mode img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.reading-mode p {
+  font-size: 1.2em !important;
+  line-height: 1.6 !important;
+  margin-bottom: 1.2em !important;
+}
+
+/* Stop animations */
+.stop-animations * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Keyboard navigation */
+.keyboard-nav :focus {
+  outline: 3px solid hsl(var(--primary)) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* Reduce motion if user prefers */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip to main content link */
+.skip-to-content {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -100%;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  padding: 0.5rem 1rem;
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
