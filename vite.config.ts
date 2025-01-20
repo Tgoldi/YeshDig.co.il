@@ -63,35 +63,43 @@ export default defineConfig({
       inject: {
         data: {
           gtmHead: `<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NPXML5CS');</script>
-<!-- End Google Tag Manager -->`,
+          <script>(function(w,d,s,l,i){
+            w[l]=w[l]||[];w[l].push({
+              'gtm.start': new Date().getTime(),event:'gtm.js'
+            });var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer', 'GTM-NPXML5CS');</script>
+          <!-- End Google Tag Manager -->`,
           gtmBody: `<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NPXML5CS"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->`
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NPXML5CS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->`
         }
       }
     })
   ],
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        secure: false,
-      }
+    port: 3000,
+    host: '0.0.0.0',
+    hmr: {
+      clientPort: 443,
+      protocol: 'wss'
+    },
+    fs: {
+      strict: false,
+      allow: ['.']
     }
   },
+  publicDir: 'public',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+      '@': path.resolve(__dirname, './src')
+    }
   },
   build: {
+    assetsDir: 'assets',
+    assetsInlineLimit: 0,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -101,7 +109,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             '@radix-ui/react-accordion',
             '@radix-ui/react-dialog',
             // ... other UI components
-          ],
+          ]
         }
       }
     },
@@ -115,5 +123,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
     }
   },
-  envPrefix: 'VITE_'
+  optimizeDeps: {
+    exclude: ['vite-plugin-pwa/info']
+  },
+  envPrefix: 'VITE'
 });

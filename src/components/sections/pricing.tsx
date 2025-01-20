@@ -42,7 +42,7 @@ const hostingPlans = [
     name: "חבילה מקצועית",
     price: "2,999",
     originalPrice: "3,500",
-    discount: "14%",
+    discount: "15%",
     duration: "זמן מחירון: 10 ימי עסקים",
     features: [
       "חמש בלוקים",
@@ -60,9 +60,9 @@ const hostingPlans = [
 const marketingPlans = [
   {
     name: "גוגל אורגני (SEO)",
-    price: "1,750",
+    price: "1,700",
     originalPrice: "2,000",
-    discount: "20%",
+    discount: "15%",
     features: [
       "מחקר מילים של עד 5/8 מילות מפתח",
       "בדיקת ושיפור מהירות אתר",
@@ -75,8 +75,8 @@ const marketingPlans = [
   },
   {
     name: "גוגל ממומן (PPC)",
-    price: "2,500",
-    originalPrice: "2,800",
+    price: "1,300",
+    originalPrice: "1,500",
     discount: "12%",
     features: [
       "ניהול עד 2 קמפיינים במקביל",
