@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { ContactDialog } from "@/components/contact-dialog";
+import { BUTTON_IDS } from '@/constants/buttonIds';
 
 const hostingPlans = [
   {
@@ -219,7 +220,9 @@ const Pricing = () => {
                         price: plan.price,
                         type: "hosting"
                       })}
-                      aria-label={`בחר תוכנית ${plan.name} במחיר ${plan.price} ש"ח`}
+                      id={index === 0 ? BUTTON_IDS.BASIC_PLAN : 
+                          index === 1 ? BUTTON_IDS.PRO_PLAN : 
+                          BUTTON_IDS.ENTERPRISE_PLAN}
                     >
                       <span>בחר תוכנית</span>
                     </Button>
@@ -295,7 +298,10 @@ const Pricing = () => {
                         price: plan.price,
                         type: "marketing"
                       })}
-                      aria-label={`בחר תוכנית ${plan.name} במחיר ${plan.price} ש"ח`}
+                      id={index === 0 ? BUTTON_IDS.MARKETING_SEO_PLAN :
+                          index === 1 ? BUTTON_IDS.MARKETING_PPC_PLAN :
+                          index === 2 ? BUTTON_IDS.MARKETING_COMBINED_PLAN :
+                          BUTTON_IDS.MARKETING_SOCIAL_PLAN}
                     >
                       <span>בחר תוכנית</span>
                     </Button>
