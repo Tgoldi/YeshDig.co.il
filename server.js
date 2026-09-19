@@ -1,12 +1,17 @@
 import express from 'express';
+import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import path from 'path';
 import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+app.use(helmet());
+
+const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // Handle modules
 app.get('/@vite/client', (req, res) => {
@@ -41,10 +46,18 @@ app.get('/@react-refresh', (req, res) => {
 function findFileInsensitive(filepath) {
     try {
         const dir = dirname(filepath);
+        if (path.resolve(dir) !== path.resolve(PUBLIC_DIR)) {
+            return null;
+        }
         const baseFileName = decodeURIComponent(filepath.split('/').pop()).toLowerCase();
         const files = fs.readdirSync(dir);
         const matchingFile = files.find(file => file.toLowerCase() === baseFileName);
-        return matchingFile ? join(dir, matchingFile) : null;
+        if (!matchingFile) return null;
+        const resolvedPath = path.resolve(join(dir, matchingFile));
+        if (!resolvedPath.startsWith(path.resolve(PUBLIC_DIR) + path.sep)) {
+            return null;
+        }
+        return resolvedPath;
     } catch (err) {
         return null;
     }
@@ -52,9 +65,14 @@ function findFileInsensitive(filepath) {
 
 // Handle GIFs
 app.get('*.gif', (req, res) => {
-    const requestedPath = join(__dirname, decodeURIComponent(req.path));
-    const filePath = findFileInsensitive(requestedPath);
-    
+    const requestedPath = join(PUBLIC_DIR, decodeURIComponent(req.path));
+    const resolvedRequestedPath = path.resolve(requestedPath);
+    if (resolvedRequestedPath !== path.resolve(PUBLIC_DIR) &&
+        !resolvedRequestedPath.startsWith(path.resolve(PUBLIC_DIR) + path.sep)) {
+        return res.status(400).send('Bad request');
+    }
+    const filePath = findFileInsensitive(resolvedRequestedPath);
+
     if (filePath && fs.existsSync(filePath)) {
         const stat = fs.statSync(filePath);
         res.writeHead(200, {
@@ -75,7 +93,7 @@ app.get('*.js', (req, res, next) => {
 });
 
 // Serve static files
-app.use(express.static(__dirname));
+app.use(express.static(PUBLIC_DIR));
 
 // SPA fallback
 app.get('*', (req, res) => {
