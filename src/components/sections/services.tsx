@@ -66,7 +66,7 @@ const PositiveIcon = () => (
 const services: Service[] = [
   {
     icons: [InstagramIcon, FacebookIcon],
-    title: "קמפיינים ממומנים ב<br/> Instagram & Facebook",
+    title: "קמפיינים ממומנים ב Instagram & Facebook",
     description: "ניהול קמפיינים ממומנים בפלטפורמות Meta, אסטרטגיית פרסום מותאמת אישית בפייסבוק ואינסטגרם, הקמת קמפיינים ממוקדי מטרה, אופטימיזציה שוטפת וניתוח ביצועים. כולל הגדרת קהלים, התקנת פיקסל ומעקב המרות."
   },
   {
@@ -81,7 +81,7 @@ const services: Service[] = [
   },
   {
     icon: PositiveIcon,
-    title: "ניהול תוכן ברשתות החברתיות </br> (Facebook & Instagram)",
+    title: "ניהול תוכן ברשתות החברתיות (Facebook & Instagram)",
     description: "יצירת והפקת תוכן מקצועי (צילומים, סרטונים ופוסטים) בפלטפורמות Meta, כולל קופירייטינג והעלאה שוטפת. שירות מענה במסנג'ר זמין כתוספת (חודש ראשון ללא עלות)."
   },
   {
@@ -123,7 +123,7 @@ const Services = () => (
                   </div>
                 ) : null}
               </div>
-              <CardTitle className="text-xl mb-2" dangerouslySetInnerHTML={{ __html: service.title }} />
+              <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">{service.description}</p>
