@@ -1,12 +1,24 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import path from 'path';
 import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const PUBLIC_DIR = path.join(__dirname, 'public');
+
 const app = express();
+
+app.use((req, res, next) => {
+    res.set('X-Content-Type-Options', 'nosniff');
+    res.set('X-Frame-Options', 'DENY');
+    res.set('X-XSS-Protection', '1; mode=block');
+    res.set('Referrer-Policy', 'no-referrer');
+    res.set('Content-Security-Policy', "default-src 'self'");
+    next();
+});
 
 // Handle modules
 app.get('/@vite/client', (req, res) => {
@@ -40,11 +52,18 @@ app.get('/@react-refresh', (req, res) => {
 // Case-insensitive file lookup helper
 function findFileInsensitive(filepath) {
     try {
-        const dir = dirname(filepath);
+        const dir = path.resolve(dirname(filepath));
+        if (dir !== PUBLIC_DIR && !dir.startsWith(PUBLIC_DIR + path.sep)) {
+            return null;
+        }
         const baseFileName = decodeURIComponent(filepath.split('/').pop()).toLowerCase();
         const files = fs.readdirSync(dir);
         const matchingFile = files.find(file => file.toLowerCase() === baseFileName);
-        return matchingFile ? join(dir, matchingFile) : null;
+        const resolved = matchingFile ? path.resolve(join(dir, matchingFile)) : null;
+        if (resolved && (resolved === PUBLIC_DIR || resolved.startsWith(PUBLIC_DIR + path.sep))) {
+            return resolved;
+        }
+        return null;
     } catch (err) {
         return null;
     }
@@ -52,9 +71,16 @@ function findFileInsensitive(filepath) {
 
 // Handle GIFs
 app.get('*.gif', (req, res) => {
-    const requestedPath = join(__dirname, decodeURIComponent(req.path));
+    const decodedPath = decodeURIComponent(req.path);
+    if (decodedPath.includes('..')) {
+        return res.status(400).send('Invalid path');
+    }
+    const requestedPath = path.resolve(join(PUBLIC_DIR, decodedPath));
+    if (requestedPath !== PUBLIC_DIR && !requestedPath.startsWith(PUBLIC_DIR + path.sep)) {
+        return res.status(400).send('Invalid path');
+    }
     const filePath = findFileInsensitive(requestedPath);
-    
+
     if (filePath && fs.existsSync(filePath)) {
         const stat = fs.statSync(filePath);
         res.writeHead(200, {
@@ -75,11 +101,11 @@ app.get('*.js', (req, res, next) => {
 });
 
 // Serve static files
-app.use(express.static(__dirname));
+app.use(express.static(PUBLIC_DIR));
 
 // SPA fallback
 app.get('*', (req, res) => {
-    res.sendFile(join(__dirname, 'index.html'));
+    res.sendFile(join(PUBLIC_DIR, 'index.html'));
 });
 
 const PORT = 3000;
