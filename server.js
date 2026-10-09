@@ -1,12 +1,35 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve, sep, extname } from 'path';
 import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+
+// Block access to server code, secrets, dotfiles and dependency/VCS folders
+const BLOCKED_NAMES = new Set(['server.js', 'package.json', 'package-lock.json', 'node_modules', 'yarn.lock', 'pnpm-lock.yaml']);
+app.use((req, res, next) => {
+    let decoded;
+    try {
+        decoded = decodeURIComponent(req.path);
+    } catch (err) {
+        return res.status(400).send('Bad request');
+    }
+    if (decoded.includes('\0')) {
+        return res.status(400).send('Bad request');
+    }
+    const segments = decoded.split(/[\\/]+/).filter(Boolean);
+    const blocked = segments.some(seg => {
+        const lower = seg.toLowerCase();
+        return lower.startsWith('.') || BLOCKED_NAMES.has(lower);
+    });
+    if (blocked) {
+        return res.status(404).send('Not found');
+    }
+    next();
+});
 
 // Handle modules
 app.get('/@vite/client', (req, res) => {
@@ -52,10 +75,24 @@ function findFileInsensitive(filepath) {
 
 // Handle GIFs
 app.get('*.gif', (req, res) => {
-    const requestedPath = join(__dirname, decodeURIComponent(req.path));
+    let requestedPath;
+    try {
+        requestedPath = resolve(__dirname, '.' + decodeURIComponent(req.path));
+    } catch (err) {
+        return res.status(400).send('Bad request');
+    }
+    if (!requestedPath.startsWith(resolve(__dirname) + sep)) {
+        return res.status(404).send('Not found');
+    }
     const filePath = findFileInsensitive(requestedPath);
     
-    if (filePath && fs.existsSync(filePath)) {
+    if (
+        filePath &&
+        filePath.startsWith(resolve(__dirname) + sep) &&
+        extname(filePath).toLowerCase() === '.gif' &&
+        fs.existsSync(filePath) &&
+        fs.statSync(filePath).isFile()
+    ) {
         const stat = fs.statSync(filePath);
         res.writeHead(200, {
             'Content-Type': 'image/gif',
@@ -75,7 +112,7 @@ app.get('*.js', (req, res, next) => {
 });
 
 // Serve static files
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { dotfiles: 'ignore' }));
 
 // SPA fallback
 app.get('*', (req, res) => {
