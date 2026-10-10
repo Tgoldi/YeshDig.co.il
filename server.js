@@ -1,12 +1,23 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, sep } from 'path';
 import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+
+const securityHeaders = (req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    if (process.env.NODE_ENV === 'production' && (req.secure || req.headers['x-forwarded-proto'] === 'https')) {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    next();
+};
+app.use(securityHeaders);
 
 // Handle modules
 app.get('/@vite/client', (req, res) => {
@@ -52,10 +63,23 @@ function findFileInsensitive(filepath) {
 
 // Handle GIFs
 app.get('*.gif', (req, res) => {
-    const requestedPath = join(__dirname, decodeURIComponent(req.path));
+    let decodedPath;
+    try {
+        decodedPath = decodeURIComponent(req.path);
+    } catch (err) {
+        return res.status(400).send('Bad request');
+    }
+    if (decodedPath.includes('\0')) {
+        return res.status(400).send('Bad request');
+    }
+    const requestedPath = join(__dirname, decodedPath);
+    const rootWithSep = __dirname.endsWith(sep) ? __dirname : __dirname + sep;
+    if (!requestedPath.startsWith(rootWithSep)) {
+        return res.status(404).send('Not found');
+    }
     const filePath = findFileInsensitive(requestedPath);
-    
-    if (filePath && fs.existsSync(filePath)) {
+
+    if (filePath && filePath.startsWith(rootWithSep) && fs.existsSync(filePath)) {
         const stat = fs.statSync(filePath);
         res.writeHead(200, {
             'Content-Type': 'image/gif',
