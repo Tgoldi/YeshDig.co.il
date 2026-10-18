@@ -65,10 +65,35 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = 'Chart';
 
+// Only block characters that could terminate a CSS declaration/block or break
+// out of the <style> element; every legitimate color syntax remains valid.
+const SAFE_COLOR_PATTERNS: RegExp[] = [
+  // hex colors
+  /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i,
+  // functional colors with simple args, optionally wrapping var(--x)
+  /^(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(\s*[0-9a-z.,%/\s+-]*(?:var\(\s*--[a-z0-9_-]+\s*\)[0-9a-z.,%/\s+-]*)*\)$/i,
+  // css variable reference
+  /^var\(\s*--[a-z0-9_-]+\s*\)$/i,
+  // keyword colors (e.g. red, transparent, currentColor)
+  /^[a-z]+$/i,
+];
+const isSafeCssValue = (value: string) =>
+  SAFE_COLOR_PATTERNS.some((pattern) => pattern.test(value.trim()));
+// Defence in depth: strip anything that could end the declaration or the
+// <style> element before interpolation. Valid colors (hex, rgb(), hsl(),
+// hsl(var(--x)), color-mix(...)) contain none of these characters.
+const sanitizeCssValue = (value: string) =>
+  value.replace(/[;{}<>\\"'\r\n]/g, '').trim();
+const isSafeCssIdent = (value: string) => /^[A-Za-z0-9_-]+$/.test(value);
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([_, config]) => config.theme || config.color
   );
+
+  if (!isSafeCssIdent(id)) {
+    return null;
+  }
 
   if (!colorConfig.length) {
     return null;
@@ -86,8 +111,13 @@ ${colorConfig
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+    if (!color || !isSafeCssIdent(key) || !isSafeCssValue(color)) {
+      return null;
+    }
+    const safeColor = sanitizeCssValue(color);
+    return '  --color-' + key + ': ' + safeColor + ';';
   })
+  .filter(Boolean)
   .join('\n')}
 }
 `

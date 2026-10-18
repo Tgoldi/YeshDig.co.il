@@ -1,12 +1,38 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve, sep } from 'path';
 import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+
+const securityHeaders = (req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    if (process.env.NODE_ENV === 'production') {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    next();
+};
+app.use(securityHeaders);
+
+// Block access to sensitive project files (source control, env, deps, server code, config)
+const BLOCKED_PATH = /(^|\/)(\.[^/]*|node_modules|server\.js|package(-lock)?\.json)(\/|$)/i;
+app.use((req, res, next) => {
+    let p;
+    try {
+        p = decodeURIComponent(req.path);
+    } catch (e) {
+        return res.status(400).send('Bad request');
+    }
+    if (p.includes('\0') || BLOCKED_PATH.test(p)) {
+        return res.status(404).send('Not found');
+    }
+    next();
+});
 
 // Handle modules
 app.get('/@vite/client', (req, res) => {
@@ -41,7 +67,7 @@ app.get('/@react-refresh', (req, res) => {
 function findFileInsensitive(filepath) {
     try {
         const dir = dirname(filepath);
-        const baseFileName = decodeURIComponent(filepath.split('/').pop()).toLowerCase();
+        const baseFileName = filepath.split(/[\\/]/).pop().toLowerCase();
         const files = fs.readdirSync(dir);
         const matchingFile = files.find(file => file.toLowerCase() === baseFileName);
         return matchingFile ? join(dir, matchingFile) : null;
@@ -52,10 +78,14 @@ function findFileInsensitive(filepath) {
 
 // Handle GIFs
 app.get('*.gif', (req, res) => {
-    const requestedPath = join(__dirname, decodeURIComponent(req.path));
+    const root = resolve(__dirname);
+    const requestedPath = resolve(root, '.' + req.path);
+    if (!requestedPath.startsWith(root + sep)) {
+        return res.status(404).send('Not found');
+    }
     const filePath = findFileInsensitive(requestedPath);
     
-    if (filePath && fs.existsSync(filePath)) {
+    if (filePath && resolve(filePath).startsWith(root + sep) && filePath.toLowerCase().endsWith('.gif') && fs.existsSync(filePath)) {
         const stat = fs.statSync(filePath);
         res.writeHead(200, {
             'Content-Type': 'image/gif',
@@ -75,7 +105,7 @@ app.get('*.js', (req, res, next) => {
 });
 
 // Serve static files
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { dotfiles: 'deny' }));
 
 // SPA fallback
 app.get('*', (req, res) => {
