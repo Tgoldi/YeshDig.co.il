@@ -65,9 +65,26 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = 'Chart';
 
+// Values below are written into a <style> tag, so only allow plain CSS
+// identifiers and color values (no braces, semicolons, quotes, tags or url()).
+const SAFE_CSS_IDENT = /^[a-zA-Z0-9_-]+$/;
+const SAFE_CSS_COLOR = /^[a-zA-Z0-9#%(),.\s/+-]+$/;
+
+function safeCssColor(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed || !SAFE_CSS_COLOR.test(trimmed)) return null;
+  if (/url\s*\(|expression\s*\(|image-set|image\s*\(/i.test(trimmed)) return null;
+  return trimmed;
+}
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
+  if (!SAFE_CSS_IDENT.test(id)) {
+    return null;
+  }
+
   const colorConfig = Object.entries(config).filter(
-    ([_, config]) => config.theme || config.color
+    ([key, config]) => SAFE_CSS_IDENT.test(key) && (config.theme || config.color)
   );
 
   if (!colorConfig.length) {
@@ -83,9 +100,10 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color =
+    const color = safeCssColor(
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color;
+        itemConfig.color
+    );
     return color ? `  --color-${key}: ${color};` : null;
   })
   .join('\n')}
