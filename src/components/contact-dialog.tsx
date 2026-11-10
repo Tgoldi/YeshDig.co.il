@@ -6,7 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { HONEYPOT_FIELD, checkLead, recordLead } from "@/lib/lead-guard";
+import { postLead } from "@/lib/lead-submit";
+import { LeadCaptcha, type LeadCaptchaHandle, captchaEnabled } from "@/components/lead-captcha";
 
 const contactSchema = z.object({
     name: z.string().min(2, "השם חייב להכיל לפחות 2 תווים"),
@@ -28,6 +31,13 @@ interface ContactDialogProps {
 
 export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }: ContactDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const honeypotRef = useRef<HTMLInputElement>(null);
+    const startedAtRef = useRef<number>(Date.now());
+    const captchaRef = useRef<LeadCaptchaHandle>(null);
+
+    useEffect(() => {
+        if (isOpen) startedAtRef.current = Date.now();
+    }, [isOpen]);
 
     const { register, handleSubmit, reset } = useForm<ContactFormData>({
         resolver: zodResolver(contactSchema),
@@ -37,8 +47,36 @@ export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }
     });
 
     const onSubmit = async (data: ContactFormData) => {
+        const check = checkLead(honeypotRef.current?.value, startedAtRef.current);
+        if (check === "bot") {
+            reset();
+            toast.success("ההודעה נשלחה בהצלחה!");
+            onClose();
+            return;
+        }
+        if (check === "limited") {
+            toast.error('נשלחו יותר מדי פניות. אנא נסו שוב מאוחר יותר.');
+            return;
+        }
+        const captchaToken = captchaRef.current?.getToken() ?? "";
+        if (captchaEnabled && !captchaToken) {
+            toast.error('אנא השלימו את אימות האבטחה ונסו שנית.');
+            return;
+        }
         setIsSubmitting(true);
         try {
+            if (import.meta.env.VITE_LEAD_ENDPOINT) {
+                // Lead goes by POST to the site's own relay, which holds the fixdigital IDs
+                await postLead(import.meta.env.VITE_LEAD_ENDPOINT, {
+                    name: data.name,
+                    email: data.email,
+                    phone: data.phone,
+                    message: data.message,
+                    plan: data.plan,
+                    captchaToken,
+                    honeypot: honeypotRef.current?.value ?? "",
+                });
+            } else {
             const formUrl = window.location.href;
             const urlRefer = document.referrer;
             const channelId = "website";
@@ -63,13 +101,17 @@ export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }
             } catch (e) {
                 // Ignore parsing errors
             }
+            }
 
+            recordLead();
             reset();
             toast.success("ההודעה נשלחה בהצלחה!");
             onClose();
         } catch (error) {
             toast.error('שגיאה בשליחת הטופס. אנא נסו שנית.');
         } finally {
+            // A captcha token works once; get a fresh one for the next send
+            captchaRef.current?.reset();
             setIsSubmitting(false);
         }
     };
@@ -85,6 +127,15 @@ export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <input type="hidden" {...register("plan")} />
+                    <input
+                        ref={honeypotRef}
+                        type="text"
+                        name={HONEYPOT_FIELD}
+                        tabIndex={-1}
+                        autoComplete="off"
+                        aria-hidden="true"
+                        style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+                    />
 
                     <div>
                         <Input
@@ -119,6 +170,8 @@ export function ContactDialog({ isOpen, onClose, planName, planPrice, planType }
                             defaultValue={`מעוניין לשמוע פרטים נוספים על ${planName}`}
                         />
                     </div>
+
+                    <LeadCaptcha ref={captchaRef} />
 
                     <Button
                         type="submit"

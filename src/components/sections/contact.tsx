@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { HONEYPOT_FIELD, checkLead, recordLead } from "@/lib/lead-guard";
+import { postLead } from "@/lib/lead-submit";
+import { LeadCaptcha, type LeadCaptchaHandle, captchaEnabled } from "@/components/lead-captcha";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,23 +22,56 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const honeypotRef = useRef<HTMLInputElement>(null);
+  const startedAtRef = useRef<number>(Date.now());
+  const captchaRef = useRef<LeadCaptchaHandle>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
 
   const onSubmit = async (data: ContactFormData) => {
+    const check = checkLead(honeypotRef.current?.value, startedAtRef.current);
+    if (check === "bot") {
+      reset();
+      toast.success("ההודעה נשלחה בהצלחה!");
+      return;
+    }
+    if (check === "limited") {
+      toast.error('נשלחו יותר מדי פניות. אנא נסו שוב מאוחר יותר.');
+      return;
+    }
+    const captchaToken = captchaRef.current?.getToken() ?? "";
+    if (captchaEnabled && !captchaToken) {
+      toast.error('אנא השלימו את אימות האבטחה ונסו שנית.');
+      return;
+    }
     setIsSubmitting(true);
     try {
-      const apiUrl = `https://www.fixdigital.co.il/api/v1.2/lead/addApi?projectID=11860&projectTypeID=10&clientID=21350&tenantID=7768&FORMURL=${encodeURIComponent(window.location.href)}&URLREFER=${encodeURIComponent(document.referrer)}&name=${encodeURIComponent(data.name)}&email=${encodeURIComponent(data.email)}&phone=${encodeURIComponent(data.phone)}&channelid=website&message=${encodeURIComponent(data.message)}&source=website`;
+      if (import.meta.env.VITE_LEAD_ENDPOINT) {
+        // Lead goes by POST to the site's own relay, which holds the fixdigital IDs
+        await postLead(import.meta.env.VITE_LEAD_ENDPOINT, {
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: data.message,
+          captchaToken,
+          honeypot: honeypotRef.current?.value ?? "",
+        });
+      } else {
+        const apiUrl = `https://www.fixdigital.co.il/api/v1.2/lead/addApi?projectID=11860&projectTypeID=10&clientID=21350&tenantID=7768&FORMURL=${encodeURIComponent(window.location.href)}&URLREFER=${encodeURIComponent(document.referrer)}&name=${encodeURIComponent(data.name)}&email=${encodeURIComponent(data.email)}&phone=${encodeURIComponent(data.phone)}&channelid=website&message=${encodeURIComponent(data.message)}&source=website`;
 
-      const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error('Network response was not ok');
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Network response was not ok');
+      }
       
+      recordLead();
       reset();
       toast.success("ההודעה נשלחה בהצלחה!");
     } catch (error) {
       toast.error('שגיאה בשליחת הטופס. אנא נסו שנית.');
     } finally {
+      // A captcha token works once; get a fresh one for the next send
+      captchaRef.current?.reset();
       setIsSubmitting(false);
     }
   };
@@ -78,6 +114,15 @@ const Contact = () => {
 
           <div className="bg-card/50 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-primary/10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <input
+                ref={honeypotRef}
+                type="text"
+                name={HONEYPOT_FIELD}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+              />
               <div className="grid md:grid-cols-2 gap-4">
                 <Input 
                   {...register("name")}
@@ -108,6 +153,7 @@ const Contact = () => {
                   className="min-h-[150px] bg-background/50 border-primary/20 focus:border-primary"
                 />
               </div>
+              <LeadCaptcha ref={captchaRef} />
               <Button 
                 type="submit" 
                 className="w-full button-hover bg-gradient-to-r from-primary to-accent hover:opacity-90"
